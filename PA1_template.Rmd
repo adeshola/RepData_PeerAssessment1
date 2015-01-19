@@ -10,6 +10,7 @@ output: html_document
 
 ```{r echo = TRUE}
 activity <- read.csv("activity.csv", header = TRUE)
+summary(activity)
 ```
 
 ### Mean total number of steps taken per day
@@ -96,5 +97,19 @@ median.total.steps.per.day.no.missing <- median(total.steps.per.day.no.missing$s
 *The mean remains unchanged however, the median is now higher and equal to the mean the total number of steps is in turn higher.*
 
 ### Weekdays and Weekends activity pattern
-
-
+1. Adding a field w for weekday or weekend.
+```{r}
+activity.no.missing$w <- "weekday"
+activity.no.missing[weekdays(as.Date(activity.no.missing$date, format = "%Y-%m-%d")) %in% c("Saturday", "Sunday"),]$w <- "weekend"
+activity.no.missing$w <- as.factor(activity.no.missing$w)
+summary(activity.no.missing$w)
+```
+2.
+```{r}
+average.steps.by.5min.and.w <- aggregate(steps ~ interval + w, activity.no.missing, mean)
+lw <- ggplot(average.steps.by.5min.and.w, aes(interval, steps, color = w)) + 
+  geom_line(aes(group=1)) +
+  facet_grid(w~., scale="free", space="free") +
+  scale_x_discrete(breaks = seq(0,2355,by=30))
+lw
+```

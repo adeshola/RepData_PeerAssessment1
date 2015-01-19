@@ -11,6 +11,18 @@ output: html_document
 
 ```r
 activity <- read.csv("activity.csv", header = TRUE)
+summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 ### Mean total number of steps taken per day
@@ -125,5 +137,28 @@ median.total.steps.per.day.no.missing <- median(total.steps.per.day.no.missing$s
 *The mean remains unchanged however, the median is now higher and equal to the mean the total number of steps is in turn higher.*
 
 ### Weekdays and Weekends activity pattern
+1. Adding a field w for weekday or weekend.
 
+```r
+activity.no.missing$w <- "weekday"
+activity.no.missing[weekdays(as.Date(activity.no.missing$date, format = "%Y-%m-%d")) %in% c("Saturday", "Sunday"),]$w <- "weekend"
+activity.no.missing$w <- as.factor(activity.no.missing$w)
+summary(activity.no.missing$w)
+```
 
+```
+## weekday weekend 
+##   12960    4608
+```
+2.
+
+```r
+average.steps.by.5min.and.w <- aggregate(steps ~ interval + w, activity.no.missing, mean)
+lw <- ggplot(average.steps.by.5min.and.w, aes(interval, steps, color = w)) + 
+  geom_line(aes(group=1)) +
+  facet_grid(w~., scale="free", space="free") +
+  scale_x_discrete(breaks = seq(0,2355,by=30))
+lw
+```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
